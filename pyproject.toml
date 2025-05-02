@@ -8,3 +8,6 @@ and associated business information, excluding local network connections.
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []
+
+[project.scripts]
+hello = "main:main"
