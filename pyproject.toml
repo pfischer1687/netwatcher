@@ -1,13 +1,38 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
 [project]
 name = "remote-ip-geo-info"
 version = "0.1.0"
 description = """
-A Python CLI tool that retrieves remote IP addresses your system is connected to, and provides their geographic location
+A Python CLI tool that retrieves remote IP addresses your system is connected to and provides their geographic location
 and associated business information, excluding local network connections.
 """
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "typer>=0.15.3"
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pre-commit>=4.2.0",
+    "pyright>=1.1.400",
+    "ruff>=0.11.8"
+]
+
 
 [project.scripts]
-hello = "main:main"
+geoip = "remote_ip_geo_info.main:main"
+
+[tool.hatch.build.targets.wheel]
+include = [
+  "remote_ip_geo_info/py.typed"
+]
+
+[tool.hatch.build.targets.editable]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
