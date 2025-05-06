@@ -1,15 +1,33 @@
 [build-system]
-requires = ["uv-build"]
-build-backend = "uv_build"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-name = "remote-ip-geo-info"
+name = "netwatcher"
 version = "0.1.0"
-description = "CLI tool to show geolocation and business info for remote IPs, excluding local network connections."
-readme = "README.md"
-requires-python = ">=3.13"
 dependencies = [
-    "typer>=0.15.3"
+    "psutil",
+    "requests",
+    "typer",
+    "httpx",
+]
+requires-python = ">=3.13"
+authors = [
+    {name = "Paul Fischer", email = "paulfischerdev@gmail.com"}
+]
+maintainers = [
+  {name = "Paul Fischer", email = "paulfischerdev@gmail.com"}
+]
+description = "Monitor and track active network connections"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+keywords = ["network", "monitoring", "CLI", "security", "Typer"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
 ]
 
 [tool.uv]
@@ -19,12 +37,14 @@ dev-dependencies = [
     "ruff>=0.11.8"
 ]
 
-[project.scripts]
-geoip = "remote_ip_geo_info.main:app"
+[project.urls]
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/pfischer1687/netwatcher"
+Issues = "https://github.com/pfischer1687/netwatcher/issues"
+Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
-[tool.uv.build-backend]
-module-root = ""
-module-name = "remote_ip_geo_info"
+[project.scripts]
+nw = "netwatcher.main:app"
 
 [tool.pyright]
 venvPath = "."
