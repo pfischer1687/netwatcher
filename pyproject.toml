@@ -38,10 +38,10 @@ dev-dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://readthedocs.org"
+Documentation = "https://github.com/pfischer1687/netwatcher/blob/main/DOCS.md"
 Repository = "https://github.com/pfischer1687/netwatcher"
 Issues = "https://github.com/pfischer1687/netwatcher/issues"
-Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+Changelog = "https://github.com/pfischer1687/netwatcher/blob/main/CHANGELOG.md"
 
 [project.scripts]
 nw = "netwatcher.main:app"
