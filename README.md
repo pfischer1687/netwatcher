@@ -97,6 +97,12 @@ service or provide your own API key, you can modify the `ip_lookup.py` file.
 To use a different geolocation service, update the httpx API call in `ip_lookup.py` to integrate with your preferred
 provider. Ensure the response format remains consistent.
 
+## Changelog Generation (`git-cliff`)
+
+This project uses [`git-cliff`](https://git-cliff.org/docs/) to generate changelogs automatically based on conventional
+commit messages. To use or update the changelog, you must have `git-cliff` installed locally or in your CI environment
+(for instructions, see link above).
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
