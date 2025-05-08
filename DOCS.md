@@ -14,10 +14,15 @@ $ netwatcher [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `hello`
-* `goodbye`
+* `hello`: _summary_.
+* `goodbye`: _summary_.
 
 ## `netwatcher hello`
+
+_summary_.
+
+Args:
+    name (str): _description_
 
 **Usage**:
 
@@ -34,6 +39,12 @@ $ netwatcher hello [OPTIONS] NAME
 * `--help`: Show this message and exit.
 
 ## `netwatcher goodbye`
+
+_summary_.
+
+Args:
+    name (str): _description_
+    formal (bool, optional): _description_. Defaults to False.
 
 **Usage**:
 

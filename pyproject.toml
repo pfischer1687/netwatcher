@@ -6,10 +6,8 @@ build-backend = "hatchling.build"
 name = "netwatcher"
 version = "0.1.0"
 dependencies = [
-    "psutil",
-    "requests",
-    "typer",
-    "httpx",
+    "psutil>=7.0.0",
+    "typer>=0.15.3",
 ]
 requires-python = ">=3.13"
 authors = [
@@ -34,6 +32,7 @@ classifiers = [
 dev-dependencies = [
     "pre-commit>=4.2.0",
     "pyright[nodejs]>=1.1.400",
+    "pytest>=8.3.5",
     "ruff>=0.11.8"
 ]
 
@@ -49,3 +48,12 @@ nw = "netwatcher.main:app"
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",
+  "D",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
