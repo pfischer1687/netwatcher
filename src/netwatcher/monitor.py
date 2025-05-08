@@ -2,9 +2,8 @@
 
 import psutil
 
-
 def get_active_connections() -> list:
-    """_summary_.
+    """Returns active connections.
 
     Returns:
         list: _description_

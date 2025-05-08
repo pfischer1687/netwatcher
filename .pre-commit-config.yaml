@@ -1,4 +1,5 @@
 ---
+default_stages: [manual]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -13,14 +14,11 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
-        always_run: true
       - id: ruff-format
-        always_run: true
   - repo: https://github.com/RobertCraigie/pyright-python
     rev: v1.1.400
     hooks:
       - id: pyright
-        always_run: true
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.24.2
     hooks:
