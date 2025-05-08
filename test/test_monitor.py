@@ -1,6 +1,6 @@
 """NetWatcher CLI - Monitor outbound network connections."""
 
-from src.netwatcher.monitor import get_active_connections
+from netwatcher.monitor import get_active_connections
 
 
 def test_get_active_connections() -> None:

@@ -2,10 +2,12 @@
 
 import psutil
 
+
 def get_active_connections() -> list:
     """Returns active connections.
 
     Returns:
         list: _description_
     """
-    return psutil.net_connections(kind="inet")
+    active_connections = psutil.net_connections(kind="inet")
+    return active_connections

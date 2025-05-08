@@ -50,12 +50,16 @@ This tool is designed for:
 uv python install 3.13
 ```
 
-3. Create a virtual environment and activate it (macOS and Linux, for Windows see
-   [here](https://docs.astral.sh/uv/pip/environments/#using-a-virtual-environment)):
+3. Create a virtual environment and activate it:
 
 ```bash
 uv venv --python 3.13
+
+# macOS and Linux
 source .venv/activate/bin
+
+# Windows
+.venv\Scripts\activate
 ```
 
 4. Install dependencies:
@@ -87,6 +91,34 @@ This will scan active network connections and output the following information:
 - Process Name (PID): The name and PID of the process using the connection.
 - Geolocation Information: The city, region, and country of the remote IP.
 
+## For Developers
+
+### Running Tests
+
+```bash
+# -s allows print() output
+# -vvv increases verbosity
+uv run pytest -s -vvv
+```
+
+### Changelog Generation
+
+This project uses [`git-cliff`](https://git-cliff.org/docs/) to generate changelogs automatically based on conventional
+commit messages. To use or update the changelog, you must have `git-cliff` installed locally or in your CI environment.
+You can do this via cargo, the Rust package manager (which you can install
+[here](https://www.rust-lang.org/tools/install)):
+
+```bash
+cargo install git-cliff
+```
+
+### Run All Pre-Commit Hooks
+
+```bash
+# This runs formatters, linters, type checks (Pyright), secret scanners, and doc generators.
+uv run pre-commit run --all-files
+```
+
 ## Configuration
 
 By default, NetWatcher uses the `ipapi` service for IP geolocation lookups. If you need to change the geolocation
@@ -96,12 +128,6 @@ service or provide your own API key, you can modify the `ip_lookup.py` file.
 
 To use a different geolocation service, update the httpx API call in `ip_lookup.py` to integrate with your preferred
 provider. Ensure the response format remains consistent.
-
-## Changelog Generation (`git-cliff`)
-
-This project uses [`git-cliff`](https://git-cliff.org/docs/) to generate changelogs automatically based on conventional
-commit messages. To use or update the changelog, you must have `git-cliff` installed locally or in your CI environment
-(for instructions, see link above).
 
 ## License
 
