@@ -56,8 +56,14 @@ target-version = 'py313'
 
 [tool.ruff.lint]
 extend-select = [
-  "UP",
+  "A",
+  "B",
   "D",
+  "I",
+  "ISC",
+  "RUF",
+  "UP",
+  "Q"
 ]
 
 [tool.ruff.lint.pydocstyle]
