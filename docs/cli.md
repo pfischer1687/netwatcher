@@ -1,5 +1,7 @@
 # NetWatcher
 
+NetWatcher CLI - Monitor outbound network connections.
+
 **Usage**:
 
 ```console
@@ -14,49 +16,41 @@ $ netwatcher [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `hello`: _summary_.
-* `goodbye`: _summary_.
+* `scan`: _summary_.
+* `version`: Print the installed version of the package.
 
-## `netwatcher hello`
+## `netwatcher scan`
 
 _summary_.
 
 Args:
-    name (str): _description_
+    verbose (int, optional): _description_. Defaults to typer.Option(1, &quot;--verbose&quot;, &quot;-v&quot;, count=True,
+        help=&quot;Increase verbosity (-v, -vv, -vvv)&quot;).
+    log_to_file (bool, optional): _description_. Defaults to typer.Option(False, help=&quot;Override default log file
+        path&quot;).
 
 **Usage**:
 
 ```console
-$ netwatcher hello [OPTIONS] NAME
+$ netwatcher scan [OPTIONS]
 ```
-
-**Arguments**:
-
-* `NAME`: [required]
 
 **Options**:
 
+* `-v`: Increase verbosity (-v, -vv, -vvv)  [default: --verbose]
+* `--log-to-file / --no-log-to-file`: Whether to log to file or just to stderr.  [default: log-to-file]
 * `--help`: Show this message and exit.
 
-## `netwatcher goodbye`
+## `netwatcher version`
 
-_summary_.
-
-Args:
-    name (str): _description_
-    formal (bool, optional): _description_. Defaults to False.
+Print the installed version of the package.
 
 **Usage**:
 
 ```console
-$ netwatcher goodbye [OPTIONS] NAME
+$ netwatcher version [OPTIONS]
 ```
-
-**Arguments**:
-
-* `NAME`: [required]
 
 **Options**:
 
-* `--formal / --no-formal`: [default: no-formal]
 * `--help`: Show this message and exit.

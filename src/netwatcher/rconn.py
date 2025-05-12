@@ -1,10 +1,11 @@
 """Provides a model to represent remote network connections including IP parsing and connection filtering."""
 
-from psutil import net_connections, CONN_ESTABLISHED
-from ipaddress import ip_address, IPv4Address, IPv6Address
-from pydantic import BaseModel
-from typing import NamedTuple, Any
+from ipaddress import IPv4Address, IPv6Address, ip_address
 from socket import AddressFamily, SocketKind
+from typing import Any, NamedTuple
+
+from psutil import CONN_ESTABLISHED, net_connections
+from pydantic import BaseModel
 
 
 class Addr(NamedTuple):

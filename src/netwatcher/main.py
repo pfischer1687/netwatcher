@@ -2,32 +2,13 @@
 
 import typer
 
-app = typer.Typer()
+from .scan import app as scan_app
+from .version import app as version_app
 
+app = typer.Typer(help="NetWatcher CLI - Monitor outbound network connections.")
 
-@app.command()
-def hello(name: str):
-    """_summary_.
-
-    Args:
-        name (str): _description_
-    """
-    print(f"Hello {name}")
-
-
-@app.command()
-def goodbye(name: str, formal: bool = False):
-    """_summary_.
-
-    Args:
-        name (str): _description_
-        formal (bool, optional): _description_. Defaults to False.
-    """
-    if formal:
-        print(f"Goodbye Ms. {name}. Have a good day.")
-    else:
-        print(f"Bye {name}!")
-
+app.add_typer(scan_app)
+app.add_typer(version_app)
 
 if __name__ == "__main__":
     app()
