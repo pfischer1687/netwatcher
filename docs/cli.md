@@ -37,8 +37,8 @@ $ netwatcher scan [OPTIONS]
 
 **Options**:
 
-* `-v`: Increase verbosity (-v, -vv, -vvv)  [default: --verbose]
-* `--log-to-file / --no-log-to-file`: Whether to log to file or just to stderr.  [default: log-to-file]
+* `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 0]
+* `-l`: Whether to log to file or just to stderr.
 * `--help`: Show this message and exit.
 
 ## `netwatcher version`
