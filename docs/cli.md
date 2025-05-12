@@ -16,18 +16,17 @@ $ netwatcher [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
-* `scan`: _summary_.
+* `scan`: Scan IP addresses using IP-API with...
 * `version`: Print the installed version of the package.
 
 ## `netwatcher scan`
 
-_summary_.
+Scan IP addresses using IP-API with configurable logging and language support.
 
 Args:
-    verbose (int, optional): _description_. Defaults to typer.Option(1, &quot;--verbose&quot;, &quot;-v&quot;, count=True,
-        help=&quot;Increase verbosity (-v, -vv, -vvv)&quot;).
-    log_to_file (bool, optional): _description_. Defaults to typer.Option(False, help=&quot;Override default log file
-        path&quot;).
+    lang (str): Language code for the IP API response. Defaults to `en`.
+    log_to_file (bool): Whether to write logs to a file instead of stderr. Defaults to `False`.
+    verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
 
 **Usage**:
 
@@ -37,8 +36,9 @@ $ netwatcher scan [OPTIONS]
 
 **Options**:
 
-* `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 0]
-* `-l`: Whether to log to file or just to stderr.
+* `--lang TEXT`: Language code for the IP API response.  [default: en]
+* `--log-to-file / --no-log-to-file`: Whether to log to file or just to stderr.  [default: no-log-to-file]
+* `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 1]
 * `--help`: Show this message and exit.
 
 ## `netwatcher version`

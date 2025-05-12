@@ -83,13 +83,19 @@ class RemoteConnection(BaseModel):
                 connection, else `None`.
         """
         conn = Sconn.from_psutil(raw)
+
         if conn is None or conn.status != CONN_ESTABLISHED:
             return None
+
+        remote_ip = ip_address(conn.raddr.ip)
+        if not remote_ip.is_global:
+            return None
+
         return cls(
             local_ip=ip_address(conn.laddr.ip),
             pid=conn.pid,
             local_port=conn.laddr.port,
-            remote_ip=ip_address(conn.raddr.ip),
+            remote_ip=remote_ip,
             remote_port=conn.raddr.port,
             status=conn.status,
         )

@@ -1,0 +1,128 @@
+"""Aynchronous HTTP client for querying the IP-API batch endpoint."""
+
+from enum import Enum
+
+from httpx import AsyncClient, HTTPStatusError, RequestError, TimeoutException
+from loguru import logger
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings
+from yarl import URL
+
+
+class Iso639LanguageCode(str, Enum):
+    """ISO 639 language codes supported by the IP-API service."""
+
+    EN = "en"
+    DE = "de"
+    ES = "es"
+    PTBR = "pt-BR"
+    FR = "fr"
+    JA = "ja"
+    ZHCN = "zh-CN"
+    RU = "ru"
+
+
+class Settings(BaseSettings):
+    """Configuration settings for interacting with the IP-API batch endpoint.
+
+    Attributes:
+        ip_api_batch_json_base_url (URL): Base URL for the batch JSON endpoint.
+        fields (int | str): Fields to return in the response, defaults to bitmask for `status,message,country,
+            countryCode,regionName,city,isp,org,asname,proxy,hosting,query` (21161499).
+        lang (Iso639LanguageCode): Language code for localizing response messages.
+        timeout (float): Timeout (in seconds) for the HTTP requests.
+    """
+
+    ip_api_batch_json_base_url: URL = URL("http://ip-api.com/batch")
+    fields: int | str = 21161499
+    lang: Iso639LanguageCode = Iso639LanguageCode.EN
+    timeout: float = 5.0
+
+    def get_ip_api_batch_json_url(self) -> str:
+        """Construct the full IP-API batch endpoint URL with query parameters.
+
+        Returns:
+            str: Fully formatted URL with `fields` and `lang` parameters applied.
+        """
+        url = self.ip_api_batch_json_base_url.update_query({"fields": self.fields, "lang": self.lang.value})
+        return str(url)
+
+
+class IPApiResponse(BaseModel):
+    """Schema for a single IP-API batch response entry."""
+
+    status: str | None = None
+    message: str | None = None
+    country: str | None = None
+    country_code: str | None = None
+    region_name: str | None = None
+    city: str | None = None
+    isp: str | None = None
+    org: str | None = None
+    asname: str | None = None
+    proxy: str | None = None
+    hosting: str | None = None
+    query: str | None = None
+
+
+class IPApiClient:
+    """Aynchronous HTTP client for querying the IP-API batch endpoint.
+
+    Attributes:
+        client (AsyncClient): The underlying async HTTP client.
+        settings (Settings): A validated settings object containing configuration.
+    """
+
+    def __init__(self, settings: Settings) -> None:
+        """Initialize the client with a settings object.
+
+        Args:
+            settings (Settings): Configuration for the client.
+        """
+        self.client = AsyncClient(timeout=settings.timeout)
+        self.settings = settings
+
+    async def fetch_batch_ip_data(self, ips: list[str]) -> list[IPApiResponse]:
+        """Perform a batch geolocation lookup asynchronously.
+
+        Args:
+            ips (list[str]): List of IP addresses to look up.
+
+        Returns:
+            list[IPApiResponse]: Parsed API responses.
+
+        Raises:
+            RuntimeError: When the API call fails or response is malformed.
+        """
+        url = self.settings.get_ip_api_batch_json_url()
+        logger.debug("Sending batch IP request to {url} with {len(ips)} IPs.")
+
+        try:
+            response = await self.client.post(url, json=ips)
+            response.raise_for_status()
+            results = response.json()
+
+            if not isinstance(results, list):
+                logger.error("Unexpected response format from IP API.")
+                raise RuntimeError("Expected a list of results from IP API.")
+
+            parsed_results = [IPApiResponse(**item) for item in results]
+            logger.info("Received {len(parsed_results)} valid responses from IP API.")
+            return parsed_results
+
+        except HTTPStatusError as e:
+            logger.error("HTTP error from IP API: {e.response.status_code} - {e.response.text}")
+            raise RuntimeError(f"IP API request failed with status {e.response.status_code}") from e
+
+        except (RequestError, TimeoutException) as e:
+            logger.error("Request to IP API failed: {e}")
+            raise RuntimeError("Request to IP API failed.") from e
+
+        except Exception as e:
+            logger.exception("Unexpected error during IP API request.")
+            raise RuntimeError("Unexpected error during IP API request.") from e
+
+    async def aclose(self) -> None:
+        """Close the underlying HTTP client to release resources."""
+        logger.debug("Closing HTTP client session.")
+        await self.client.aclose()
