@@ -24,7 +24,7 @@ $ netwatcher [OPTIONS] COMMAND [ARGS]...
 Scan IP addresses using IP-API with configurable logging and language support.
 
 Args:
-    lang (str): Language code for the IP API response. Defaults to `en`.
+    ip_api_lang (str): Language code for the IP API response. Defaults to `en`.
     log_to_file (bool): Whether to write logs to a file instead of stderr. Defaults to `False`.
     verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
 
@@ -36,8 +36,8 @@ $ netwatcher scan [OPTIONS]
 
 **Options**:
 
-* `--lang TEXT`: Language code for the IP API response.  [default: en]
-* `--log-to-file / --no-log-to-file`: Whether to log to file or just to stderr.  [default: no-log-to-file]
+* `-l, --lang TEXT`: Language code for the IP API response.  [default: en]
+* `-f, --log-to-file`: Whether to log to file or just to stderr.
 * `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 1]
 * `--help`: Show this message and exit.
 

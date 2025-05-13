@@ -29,22 +29,22 @@ class Settings(BaseSettings):
         ip_api_batch_json_base_url (URL): Base URL for the batch JSON endpoint.
         fields (int | str): Fields to return in the response, defaults to bitmask for `status,message,country,
             countryCode,regionName,city,isp,org,asname,proxy,hosting,query` (21161499).
-        lang (Iso639LanguageCode): Language code for localizing response messages.
+        ip_api_lang (Iso639LanguageCode): Language code for localizing response messages.
         timeout (float): Timeout (in seconds) for the HTTP requests.
     """
 
     ip_api_batch_json_base_url: URL = URL("http://ip-api.com/batch")
     fields: int | str = 21161499
-    lang: Iso639LanguageCode = Iso639LanguageCode.EN
+    ip_api_lang: Iso639LanguageCode = Iso639LanguageCode.EN
     timeout: float = 5.0
 
     def get_ip_api_batch_json_url(self) -> str:
         """Construct the full IP-API batch endpoint URL with query parameters.
 
         Returns:
-            str: Fully formatted URL with `fields` and `lang` parameters applied.
+            str: Fully formatted URL with `fields` and `ip_api_lang` parameters applied.
         """
-        url = self.ip_api_batch_json_base_url.update_query({"fields": self.fields, "lang": self.lang.value})
+        url = self.ip_api_batch_json_base_url.update_query({"fields": self.fields, "lang": self.ip_api_lang.value})
         return str(url)
 
 
