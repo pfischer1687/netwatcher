@@ -28,14 +28,16 @@ class Settings(BaseSettings):
     """Configuration settings for interacting with the IP-API batch endpoint.
 
     Attributes:
-        fields (int | str): Fields to return in the response, defaults to bitmask for `status,message,country,
-            countryCode,regionName,city,isp,org,asname,proxy,hosting,query` (21161499).
+        country_code (str): User's ISO 3166-1 alpha-2 two-leter country code.
+        fields (int | str): Fields to return in the response, defaults to bitmask for status,message,country,
+            countryCode,regionName,city,isp,org,as,asname,mobile,proxy,hosting,query` (21229083).
         ip_api_batch_json_base_url (URL): Base URL for the batch JSON endpoint.
         ip_api_lang (Iso639LanguageCode): Language code for localizing response messages.
         max_batch_size (int): Maximum number of queries in the IP-API batch endpoint before rate-limiting occurs.
         timeout (float): Timeout (in seconds) for the HTTP requests.
     """
 
+    country_code: str = "US"
     fields: int | str = 21161499
     ip_api_batch_json_base_url: URL = URL("http://ip-api.com/batch")
     ip_api_lang: Iso639LanguageCode = Iso639LanguageCode.EN
@@ -63,7 +65,9 @@ class IPApiResponse(BaseModel):
     city: str | None = None
     isp: str | None = None
     org: str | None = None
+    as_: str | None = None
     asname: str | None = None
+    mobile: bool | None = None
     proxy: bool | None = None
     hosting: bool | None = None
     query: str | None = None

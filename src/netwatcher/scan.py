@@ -29,6 +29,9 @@ async def fetch_batch_ip_data(ips: list[str], settings: Settings):
 
 @app.command()
 def scan(
+    country_code: Annotated[
+        str, Option("-c", "--country-code", help="User's ISO 3166-1 alpha-2 two-leter country code.")
+    ] = "US",
     ip_api_lang: Annotated[str, Option("-l", "--lang", help="Language code for the IP API response.")] = "en",
     log_to_file: Annotated[
         bool, Option("-f", "--log-to-file", is_flag=True, help="Whether to log to file or just to stderr.")
@@ -38,6 +41,7 @@ def scan(
     """Scan IP addresses using IP-API with configurable logging and language support.
 
     Args:
+        country_code (str): User's ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
         ip_api_lang (str): Language code for the IP API response. Defaults to `en`.
         log_to_file (bool): Whether to write logs to a file instead of stderr. Defaults to `False`.
         verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
@@ -48,7 +52,7 @@ def scan(
 
     try:
         iso_language_code = Iso639LanguageCode(ip_api_lang)
-        settings = Settings(ip_api_lang=iso_language_code)
+        settings = Settings(country_code=country_code, ip_api_lang=iso_language_code)
     except ValueError as e:
         logger.error("Invalid language: {language}. Must be one of: {[i.value for i in Iso639LanguageCode]}")
         raise Exit(code=1) from e
