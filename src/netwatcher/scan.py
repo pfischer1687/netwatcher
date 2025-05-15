@@ -1,19 +1,22 @@
 """Monitor outbound network connections and fetch IP geolocation data."""
 
 import asyncio
+from pathlib import Path
 from typing import Annotated
 
 from loguru import logger
 from typer import Exit, Option, Typer
 
-from .ip_api_client import IPApiClient, Iso639LanguageCode, Settings
+from .ip_api_client import IPApiClient, IPApiResponse, Iso639LanguageCode, Settings
+from .ip_threat_assessment import IPThreatAssessment
 from .logging_config import setup_logging
 from .rconn import get_remote_connections
+from .rich_ui import display_ip_threats
 
 app = Typer()
 
 
-async def fetch_batch_ip_data(ips: list[str], settings: Settings):
+async def fetch_batch_ip_data(ips: list[str], settings: Settings) -> list[IPApiResponse]:
     """Fetch geolocation data for a batch of IP addresses.
 
     Args:
@@ -32,10 +35,8 @@ def scan(
     country_code: Annotated[
         str, Option("-c", "--country-code", help="User's ISO 3166-1 alpha-2 two-leter country code.")
     ] = "US",
-    ip_api_lang: Annotated[str, Option("-l", "--lang", help="Language code for the IP API response.")] = "en",
-    log_to_file: Annotated[
-        bool, Option("-f", "--log-to-file", is_flag=True, help="Whether to log to file or just to stderr.")
-    ] = False,
+    ip_api_lang: Annotated[str, Option("--lang", help="Language code for the IP API response.")] = "en",
+    log_dir: Annotated[Path | None, Option(help="Optional directory location for which to write a log file.")] = None,
     verbose: Annotated[int, Option("-v", "--verbose", count=True, help="Increase verbosity (-v, -vv, -vvv)")] = 1,
 ) -> None:
     """Scan IP addresses using IP-API with configurable logging and language support.
@@ -43,12 +44,12 @@ def scan(
     Args:
         country_code (str): User's ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
         ip_api_lang (str): Language code for the IP API response. Defaults to `en`.
-        log_to_file (bool): Whether to write logs to a file instead of stderr. Defaults to `False`.
+        log_dir (Path or None): Optional directory location for which to write a log file. Defaults to `None`.
         verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
     """
-    setup_logging(verbose, log_to_file)
+    setup_logging(log_dir=log_dir, verbose=verbose)
 
-    logger.info(f"Initializing scan with ip_api_lang={ip_api_lang}, log_to_file={log_to_file}, verbose={verbose}")
+    logger.info(f"Initializing scan with ip_api_lang={ip_api_lang}, log_dir={log_dir}, verbose={verbose}")
 
     try:
         iso_language_code = Iso639LanguageCode(ip_api_lang)
@@ -67,7 +68,10 @@ def scan(
 
     logger.info(f"Querying IP-API for {len(ips)} IPs")
     try:
-        _batch_ip_data = asyncio.run(fetch_batch_ip_data(ips, settings))
+        batch_ip_data = asyncio.run(fetch_batch_ip_data(ips, settings))
     except RuntimeError as e:
         logger.error("Failed to fetch IP data: {e.response.status_code} - {e.response.text}")
         raise Exit(code=1) from e
+
+    ip_threat_assessments = IPThreatAssessment.from_batch_ip_data(batch_ip_data, country_code=settings.country_code)
+    display_ip_threats(ip_threat_assessments)

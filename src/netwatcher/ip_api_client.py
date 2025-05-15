@@ -4,11 +4,17 @@ from enum import Enum
 from types import TracebackType
 from typing import Self
 
-from httpx import AsyncClient, HTTPStatusError, RequestError, TimeoutException
+from httpx import AsyncClient, HTTPError
 from loguru import logger
 from pydantic import BaseModel, ValidationError
 from pydantic_settings import BaseSettings
 from yarl import URL
+
+
+class IPApiClientError(Exception):
+    """Custom exception for errors encountered when calling the IP-API service."""
+
+    pass
 
 
 class Iso639LanguageCode(str, Enum):
@@ -114,26 +120,26 @@ class IPApiClient:
             list[IPApiResponse]: Parsed API responses.
 
         Raises:
-            RuntimeError: When the API call fails or response is malformed.
+            IPApiClientError: When the API call does not receive a response in the correct format.
         """
+        if len(ips) > self.settings.max_batch_size:
+            logger.warning(
+                f"{len(ips)} IP addresses are listed, only querying for the first {self.settings.max_batch_size} "
+                "due to rate limits."
+            )
+            ips = ips[: self.settings.max_batch_size]
+
         url = self.settings.get_ip_api_batch_json_url()
+
         logger.debug(f"Sending batch IP request to {url} with {len(ips)} IPs.")
-
         try:
-            if len(ips) > self.settings.max_batch_size:
-                logger.warning(
-                    f"{len(ips)} IP addresses are listed, only querying for the first {self.settings.max_batch_size} "
-                    "due to rate limits."
-                )
-                ips = ips[: self.settings.max_batch_size]
-
             response = await self.client.post(url, json=ips)
             response.raise_for_status()
             results = response.json()
 
             if not isinstance(results, list):
                 logger.error("Unexpected response format from IP API.")
-                raise RuntimeError("Expected a list of results from IP API.")
+                raise HTTPError("Expected a list of results from IP API.")
 
             parsed_results = []
             for item in results:
@@ -146,17 +152,9 @@ class IPApiClient:
             logger.info(f"Received {len(parsed_results)} valid responses from IP API.")
             return parsed_results
 
-        except HTTPStatusError as e:
-            logger.error("HTTP error from IP API: {e.response.status_code} - {e.response.text}")
-            raise RuntimeError(f"IP API request failed with status {e.response.status_code}") from e
-
-        except (RequestError, TimeoutException) as e:
-            logger.error("Request to IP API failed: {e}")
-            raise RuntimeError("Request to IP API failed.") from e
-
-        except Exception as e:
-            logger.error("Unexpected error during IP API request.")
-            raise RuntimeError("Unexpected error during IP API request.") from e
+        except HTTPError as e:
+            logger.error("HTTP Exception for {e.request.url} - {e}")
+            raise IPApiClientError("IP API Client Exception") from e
 
     async def aclose(self) -> None:
         """Close the underlying HTTP client to release resources."""

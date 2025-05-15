@@ -19,8 +19,8 @@ class IPThreatAssessment(BaseModel):
     reasons: list[str]
 
     @staticmethod
-    def get_reasons(ip_data: IPApiResponse, country_code: str) -> list[str]:
-        """Analyzes the IPApiResponse and determines why an IP should be flagged.
+    def get_reasons(ip_data: IPApiResponse, country_code: str = "US") -> list[str]:
+        """Analyzes the `IPApiResponse` and determines why an IP should be flagged.
 
         Args:
             ip_data (IPApiResponse): The response data for an individual IP.
@@ -53,10 +53,10 @@ class IPThreatAssessment(BaseModel):
         return reasons
 
     @classmethod
-    def from_ip_api_response(
+    def from_batch_ip_data(
         cls,
         responses: list[IPApiResponse],
-        country_code: str,
+        country_code: str = "US",
     ) -> list["IPThreatAssessment"]:
         """Converts a list of IPApiResponse instances into threat assessments.
 

@@ -6,9 +6,11 @@ import pytest
 
 from netwatcher.ip_api_client import IPApiClient, IPApiResponse, Settings
 
+from .utils import get_mock_batch_ip_data
+
 
 @pytest.fixture
-def mock_settings():
+def mock_settings() -> Settings:
     """Fixture that returns a default `Settings` object..
 
     Returns:
@@ -17,44 +19,8 @@ def mock_settings():
     return Settings()
 
 
-def get_mock_return_value() -> list[dict[str, str]]:
-    """Gets a mock API response.
-
-    Returns:
-        list[dict[str, str]]: A simulated IP-API batch JSON endpoint response.
-    """
-    return [
-        {
-            "status": "success",
-            "country": "United States",
-            "countryCode": "US",
-            "regionName": "California",
-            "city": "Mountain View",
-            "isp": "Google LLC",
-            "org": "Google LLC",
-            "asname": "GOOGLE",
-            "proxy": "false",
-            "hosting": "false",
-            "query": "8.8.8.8",
-        },
-        {
-            "status": "success",
-            "country": "Australia",
-            "countryCode": "AU",
-            "regionName": "New South Wales",
-            "city": "Sydney",
-            "isp": "Cloudflare",
-            "org": "Cloudflare",
-            "asname": "CLOUDFLARENET",
-            "proxy": "false",
-            "hosting": "false",
-            "query": "1.1.1.1",
-        },
-    ]
-
-
 @pytest.mark.asyncio
-async def test_fetch_batch_ip_data(mock_settings: Settings):
+async def test_fetch_batch_ip_data(mock_settings: Settings) -> None:
     """Test `IPApiClient.fetch_batch_ip_data` with a valid successful response.
 
     Args:
@@ -69,7 +35,7 @@ async def test_fetch_batch_ip_data(mock_settings: Settings):
 
     mock_post_response = MagicMock()
     mock_post_response.status_code = 200
-    mock_post_response.json.return_value = get_mock_return_value()
+    mock_post_response.json.return_value = get_mock_batch_ip_data()
     mock_post_response.raise_for_status = MagicMock()
 
     client = IPApiClient(mock_settings)

@@ -26,7 +26,7 @@ Scan IP addresses using IP-API with configurable logging and language support.
 Args:
     country_code (str): User&#x27;s ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
     ip_api_lang (str): Language code for the IP API response. Defaults to `en`.
-    log_to_file (bool): Whether to write logs to a file instead of stderr. Defaults to `False`.
+    log_dir (Path or None): Optional directory location for which to write a log file. Defaults to `None`.
     verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
 
 **Usage**:
@@ -38,8 +38,8 @@ $ netwatcher scan [OPTIONS]
 **Options**:
 
 * `-c, --country-code TEXT`: User&#x27;s ISO 3166-1 alpha-2 two-leter country code.  [default: US]
-* `-l, --lang TEXT`: Language code for the IP API response.  [default: en]
-* `-f, --log-to-file`: Whether to log to file or just to stderr.
+* `--lang TEXT`: Language code for the IP API response.  [default: en]
+* `--log-dir PATH`: Optional directory location for which to write a log file.
 * `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 1]
 * `--help`: Show this message and exit.
 

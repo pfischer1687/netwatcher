@@ -11,7 +11,7 @@ from loguru import logger
 
 SCAN_LOGGER_ROTATION = "500 MB"
 LOGGER_FILE_FORMAT = "{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
-LOGGER_FILEPATH = Path("logs/netwatcher-{time:YYYY-MM-DD-HH-mm-ss}.log").resolve()
+LOGGER_FILENAME = "netwatcher-{time:YYYY-MM-DD-HH-mm-ss}.log"
 
 
 class Verbosity(str, Enum):
@@ -62,23 +62,24 @@ def stderr_fmt(record: loguru.Record) -> str:
         return "<green>{time}</> - {level} - <lvl>{message}</lvl>\n{exception}"
 
 
-def setup_logging(verbose: int, log_to_file: bool = False) -> None:
+def setup_logging(log_dir: Path | None = None, verbose: int = 1) -> None:
     """Configure Loguru logging with optional file logging.
 
     This sets up a stderr sink with dynamic formatting and optional structured file logging
     with rotation and JSON serialization.
 
     Args:
-        verbose (int): Verbosity level from `-v` flags.
-        log_to_file (bool): Whether to also log to a file.
+        log_dir (Path or None): Optional directory location for which to write a log file. Defaults to `None`.
+        verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
     """
     logger.remove()
     level = Verbosity.from_count(verbose).value
     logger.add(sink=stderr, format=stderr_fmt, colorize=True, level=level, backtrace=True, diagnose=True, enqueue=True)
 
-    if log_to_file:
+    if log_dir is not None:
+        sink = log_dir.joinpath(LOGGER_FILENAME).resolve()
         logger.add(
-            sink=LOGGER_FILEPATH,
+            sink=sink,
             level=level,
             format=LOGGER_FILE_FORMAT,
             serialize=True,
