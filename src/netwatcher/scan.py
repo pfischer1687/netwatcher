@@ -11,7 +11,7 @@ from .ip_api_client import IPApiClient, IPApiResponse, Iso639LanguageCode, Setti
 from .ip_threat_assessment import IPThreatAssessment
 from .logging_config import setup_logging
 from .rconn import get_remote_connections
-from .rich_ui import display_ip_threats
+from .ui import IPTableRenderer
 
 app = Typer()
 
@@ -35,6 +35,9 @@ def scan(
     country_code: Annotated[
         str, Option("-c", "--country-code", help="User's ISO 3166-1 alpha-2 two-leter country code.")
     ] = "US",
+    html_dir: Annotated[
+        Path | None, Option(help="Optional directory location for which to write an HTML report.")
+    ] = None,
     ip_api_lang: Annotated[str, Option("--lang", help="Language code for the IP API response.")] = "en",
     log_dir: Annotated[Path | None, Option(help="Optional directory location for which to write a log file.")] = None,
     verbose: Annotated[int, Option("-v", "--verbose", count=True, help="Increase verbosity (-v, -vv, -vvv)")] = 1,
@@ -43,17 +46,21 @@ def scan(
 
     Args:
         country_code (str): User's ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
+        html_dir (Path | None): Optional directory location for which to write an HTML report. Defaults to `None`.
         ip_api_lang (str): Language code for the IP API response. Defaults to `en`.
-        log_dir (Path or None): Optional directory location for which to write a log file. Defaults to `None`.
+        log_dir (Path | None): Optional directory location for which to write a log file. Defaults to `None`.
         verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
     """
     setup_logging(log_dir=log_dir, verbose=verbose)
 
-    logger.info(f"Initializing scan with ip_api_lang={ip_api_lang}, log_dir={log_dir}, verbose={verbose}")
+    logger.info(
+        f"Initializing scan with country_code={country_code}, html_dir={html_dir}, ip_api_lang={ip_api_lang}, "
+        f"log_dir={log_dir}, verbose={verbose}"
+    )
 
     try:
         iso_language_code = Iso639LanguageCode(ip_api_lang)
-        settings = Settings(country_code=country_code, ip_api_lang=iso_language_code)
+        settings = Settings(country_code=country_code, html_dir=html_dir, ip_api_lang=iso_language_code)
     except ValueError as e:
         logger.error("Invalid language: {language}. Must be one of: {[i.value for i in Iso639LanguageCode]}")
         raise Exit(code=1) from e
@@ -74,4 +81,5 @@ def scan(
         raise Exit(code=1) from e
 
     ip_threat_assessments = IPThreatAssessment.from_batch_ip_data(batch_ip_data, country_code=settings.country_code)
-    display_ip_threats(ip_threat_assessments)
+    renderer = IPTableRenderer(html_dir=settings.html_dir)
+    renderer.render(ip_threat_assessments)

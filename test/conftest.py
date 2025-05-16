@@ -1,7 +1,12 @@
-"""Utility functions for unit tests of the Netwatcher CLI."""
+"""Shared test fixtures for Netwatcher CLI unit tests."""
+
+import pytest
+
+from netwatcher.ip_api_client import IPApiResponse, Settings
 
 
-def get_mock_batch_ip_data() -> list[dict[str, str]]:
+@pytest.fixture
+def mock_batch_ip_data() -> list[dict[str, str]]:
     """Gets a mock API response.
 
     Returns:
@@ -37,3 +42,26 @@ def get_mock_batch_ip_data() -> list[dict[str, str]]:
             "query": "1.1.1.1",
         },
     ]
+
+
+@pytest.fixture
+def mock_ip_api_responses(mock_batch_ip_data: list[dict[str, str]]) -> list[IPApiResponse]:
+    """Return a list of validated IPApiResponse objects for testing.
+
+    Args:
+        mock_batch_ip_data (list[dict[str, str]]): Mock batch IP data.
+
+    Returns:
+        list[IPApiResponse]: List of validated IPApiResponse objects for testing.
+    """
+    return [IPApiResponse.model_validate(entry) for entry in mock_batch_ip_data]
+
+
+@pytest.fixture
+def mock_settings() -> Settings:
+    """Fixture that returns a default `Settings` object..
+
+    Returns:
+        Settings: A settings object configured for testing.
+    """
+    return Settings()

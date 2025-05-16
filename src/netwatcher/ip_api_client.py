@@ -1,12 +1,13 @@
 """Aynchronous HTTP client for querying the IP-API batch endpoint."""
 
 from enum import Enum
+from pathlib import Path
 from types import TracebackType
 from typing import Self
 
 from httpx import AsyncClient, HTTPError
 from loguru import logger
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from pydantic_settings import BaseSettings
 from yarl import URL
 
@@ -35,8 +36,10 @@ class Settings(BaseSettings):
 
     Attributes:
         country_code (str): User's ISO 3166-1 alpha-2 two-leter country code.
-        fields (int | str): Fields to return in the response, defaults to bitmask for status,message,country,
-            countryCode,regionName,city,isp,org,as,asname,mobile,proxy,hosting,query` (21229083).
+        fields (int | str): Fields to return in the response, defaults to bitmask for all including `status,message,
+            continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,
+            currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query` (66846719).
+        html_dir (Path | None): Optional directory location for which to write an HTML report. Defaults to `None`.
         ip_api_batch_json_base_url (URL): Base URL for the batch JSON endpoint.
         ip_api_lang (Iso639LanguageCode): Language code for localizing response messages.
         max_batch_size (int): Maximum number of queries in the IP-API batch endpoint before rate-limiting occurs.
@@ -44,7 +47,8 @@ class Settings(BaseSettings):
     """
 
     country_code: str = "US"
-    fields: int | str = 21161499
+    fields: int | str = 66846719
+    html_dir: Path | None = None
     ip_api_batch_json_base_url: URL = URL("http://ip-api.com/batch")
     ip_api_lang: Iso639LanguageCode = Iso639LanguageCode.EN
     max_batch_size: int = 100
@@ -63,16 +67,29 @@ class Settings(BaseSettings):
 class IPApiResponse(BaseModel):
     """Schema for a single IP-API batch response entry."""
 
+    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
+
     status: str | None = None
     message: str | None = None
+    continent: str | None = None
+    continent_code: str | None = Field(default=None, alias="continentCode")
     country: str | None = None
-    country_code: str | None = None
-    region_name: str | None = None
+    country_code: str | None = Field(default=None, alias="countryCode")
+    region: str | None = None
+    region_name: str | None = Field(default=None, alias="regionName")
     city: str | None = None
+    district: str | None = None
+    zip: str | None = None
+    lat: float | None = None
+    lon: float | None = None
+    timezone: str | None = None
+    offset: int | None = None
+    currency: str | None = None
     isp: str | None = None
     org: str | None = None
-    as_: str | None = None
+    as_: str | None = Field(default=None, alias="as")
     asname: str | None = None
+    reverse: str | None = None
     mobile: bool | None = None
     proxy: bool | None = None
     hosting: bool | None = None

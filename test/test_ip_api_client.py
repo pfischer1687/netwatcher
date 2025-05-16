@@ -6,24 +6,14 @@ import pytest
 
 from netwatcher.ip_api_client import IPApiClient, IPApiResponse, Settings
 
-from .utils import get_mock_batch_ip_data
-
-
-@pytest.fixture
-def mock_settings() -> Settings:
-    """Fixture that returns a default `Settings` object..
-
-    Returns:
-        Settings: A settings object configured for testing.
-    """
-    return Settings()
-
 
 @pytest.mark.asyncio
-async def test_fetch_batch_ip_data(mock_settings: Settings) -> None:
+@pytest.mark.usefixtures("mock_ip_api_responses", "mock_settings")
+async def test_fetch_batch_ip_data(mock_ip_api_responses: list[IPApiResponse], mock_settings: Settings) -> None:
     """Test `IPApiClient.fetch_batch_ip_data` with a valid successful response.
 
     Args:
+        mock_ip_api_responses (list[IPApiResponse]): Mock IP API responses.
         mock_settings (Settings): A fixture providing configuration for the API client.
 
     Asserts:
@@ -35,7 +25,7 @@ async def test_fetch_batch_ip_data(mock_settings: Settings) -> None:
 
     mock_post_response = MagicMock()
     mock_post_response.status_code = 200
-    mock_post_response.json.return_value = get_mock_batch_ip_data()
+    mock_post_response.json.return_value = mock_ip_api_responses
     mock_post_response.raise_for_status = MagicMock()
 
     client = IPApiClient(mock_settings)

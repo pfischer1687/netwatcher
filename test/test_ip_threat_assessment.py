@@ -1,9 +1,9 @@
 """Unit tests for IPThreatAssessment model and logic."""
 
+import pytest
+
 from netwatcher.ip_api_client import IPApiResponse
 from netwatcher.ip_threat_assessment import IPThreatAssessment
-
-from .utils import get_mock_batch_ip_data
 
 
 def get_mock_reasons() -> list[list[str]]:
@@ -26,9 +26,14 @@ def get_mock_reasons() -> list[list[str]]:
     ]
 
 
-def test_get_reasons_returns_expected_threat_flags() -> None:
-    """Test that get_reasons returns correct threat indicators for different IP inputs."""
-    no_threat_data_raw, threat_data_raw = get_mock_batch_ip_data()
+@pytest.mark.usefixtures("mock_ip_api_responses")
+def test_get_reasons_returns_expected_threat_flags(mock_ip_api_responses: list[IPApiResponse]) -> None:
+    """Test that get_reasons returns correct threat indicators for different IP inputs.
+
+    Args:
+        mock_ip_api_responses (list[IPApiResponse]): Mock IP API responses.
+    """
+    no_threat_data_raw, threat_data_raw = mock_ip_api_responses
     no_threat_data = IPApiResponse.model_validate(no_threat_data_raw)
     threat_data = IPApiResponse.model_validate(threat_data_raw)
 
@@ -41,12 +46,14 @@ def test_get_reasons_returns_expected_threat_flags() -> None:
     assert threat_result == expected_threat
 
 
-def test_from_batch_ip_data_returns_enriched_assessments() -> None:
-    """Test that from_batch_ip_data properly flags IPs and includes correct reasons."""
-    raw_ip_data = get_mock_batch_ip_data()
-    parsed_data = [IPApiResponse.model_validate(entry) for entry in raw_ip_data]
+@pytest.mark.usefixtures("mock_ip_api_responses")
+def test_from_batch_ip_data_returns_enriched_assessments(mock_ip_api_responses: list[IPApiResponse]) -> None:
+    """Test that from_batch_ip_data properly flags IPs and includes correct reasons.
 
-    assessments = IPThreatAssessment.from_batch_ip_data(parsed_data, country_code="US")
+    Args:
+        mock_ip_api_responses (list[IPApiResponse]): Mock IP API responses.
+    """
+    assessments = IPThreatAssessment.from_batch_ip_data(mock_ip_api_responses, country_code="US")
     expected_reasons = get_mock_reasons()
 
     assert len(assessments) == 2
