@@ -1,22 +1,37 @@
-"""Provides a model to represent remote network connections including IP parsing and connection filtering."""
+"""Provides models for inspecting remote network connections and associated process metadata."""
 
 from ipaddress import IPv4Address, IPv6Address, ip_address
 from socket import AddressFamily, SocketKind
 from typing import Any, NamedTuple
 
-from psutil import CONN_ESTABLISHED, net_connections
+from psutil import CONN_ESTABLISHED, Process, net_connections
 from pydantic import BaseModel
 
 
 class Addr(NamedTuple):
-    """Represents a local or remote network address."""
+    """Represents a local or remote network address.
+
+    Attributes:
+        ip (str): IP address as a string.
+        port (int): Port number.
+    """
 
     ip: str
     port: int
 
 
 class Sconn(NamedTuple):
-    """Represents a socket connection."""
+    """Represents a socket connection with metadata.
+
+    Attributes:
+        fd (int): File descriptor.
+        family (AddressFamily): Address family (e.g., AF_INET).
+        type (SocketKind): Socket type (e.g., SOCK_STREAM).
+        laddr (Addr): Local address.
+        raddr (Addr): Remote address.
+        status (str): Connection status (e.g., ESTABLISHED).
+        pid (int): Process ID associated with the connection.
+    """
 
     fd: int
     family: AddressFamily
@@ -61,15 +76,73 @@ class Sconn(NamedTuple):
         return conn
 
 
+class ProcessInfo(BaseModel):
+    """Represents metadata about a process.
+
+    Attributes:
+        cmdline (list[str]): Command-line arguments used to start the process.
+        exe (str): Path to the executable.
+        name (str): Name of the executable.
+        pid (int): Process ID.
+        parent_name (Optional[str]): Name of the parent process.
+        parent_pid (Optional[int]): PID of the parent process.
+    """
+
+    cmdline: list[str]
+    exe: str
+    name: str
+    pid: int
+    parent_name: str | None = None
+    parent_pid: int | None = None
+
+    @classmethod
+    def from_pid(cls, pid: int) -> "ProcessInfo | None":
+        """Extract process metadata from a PID.
+
+        Args:
+            pid (int): The process ID.
+
+        Returns:
+            ProcessInfo | None: Metadata about the process, `None` if it is not running.
+        """
+        try:
+            proc = Process(pid)
+
+            if not proc.is_running():
+                return None
+
+            with proc.oneshot():
+                cmdline = proc.cmdline()
+                exe = proc.exe()
+                name = proc.name()
+                parent = proc.parent()
+                parent_name = parent.name() if parent else None
+                parent_pid = parent.pid if parent else None
+
+        except Exception:
+            return None
+
+        return cls(cmdline=cmdline, exe=exe, name=name, pid=pid, parent_name=parent_name, parent_pid=parent_pid)
+
+
 class RemoteConnection(BaseModel):
-    """Represents a remote network connection."""
+    """Represents an established remote network connection.
+
+    Attributes:
+        local_ip (IPv4Address | IPv6Address): IP address on the local side.
+        local_port (int): Port on the local side.
+        remote_ip (IPv4Address | IPv6Address): IP address on the remote side.
+        remote_port (int): Port on the remote side.
+        status (str): Connection status (e.g., ESTABLISHED).
+        process_info (ProcessInfo | None): Metadata about the owning process. Defaults to `None`.
+    """
 
     local_ip: IPv4Address | IPv6Address
     local_port: int
-    pid: int
     remote_ip: IPv4Address | IPv6Address
     remote_port: int
     status: str
+    process_info: ProcessInfo | None = None
 
     @classmethod
     def from_psutil(cls, raw: Any) -> "RemoteConnection | None":
@@ -93,26 +166,26 @@ class RemoteConnection(BaseModel):
 
         return cls(
             local_ip=ip_address(conn.laddr.ip),
-            pid=conn.pid,
             local_port=conn.laddr.port,
             remote_ip=remote_ip,
             remote_port=conn.raddr.port,
             status=conn.status,
+            process_info=ProcessInfo.from_pid(conn.pid),
         )
 
+    @classmethod
+    def get_remote_connection_map(cls) -> dict[str, "RemoteConnection"]:
+        """Gets map from remote IP addresses to corresponding `RemoteConnection`s with process metadata.
 
-def get_remote_connections() -> list[RemoteConnection]:
-    """Get established remote network connections.
+        Returns:
+            dict[str, RemoteConnection]: Map from remote IP address to `RemoteConnection`.
+        """
+        conns = net_connections(kind="inet")
+        rconn_map: dict[str, RemoteConnection] = {}
 
-    Returns:
-        list[RemoteConnection]: List of established remote network connections.
-    """
-    conns = net_connections(kind="inet")
-    validated_remote_connections = []
+        for raw_conn in conns:
+            conn = RemoteConnection.from_psutil(raw_conn)
+            if conn:
+                rconn_map[str(conn.remote_ip)] = conn
 
-    for conn in conns:
-        validated_conn = RemoteConnection.from_psutil(conn)
-        if validated_conn is not None:
-            validated_remote_connections.append(validated_conn)
-
-    return validated_remote_connections
+        return rconn_map

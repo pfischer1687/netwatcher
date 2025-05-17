@@ -1,5 +1,6 @@
-"""Aynchronous HTTP client for querying the IP-API batch endpoint."""
+"""Asynchronous HTTP client for querying the IP-API batch JSON endpoint."""
 
+from asyncio import gather
 from enum import Enum
 from pathlib import Path
 from types import TracebackType
@@ -7,15 +8,9 @@ from typing import Self
 
 from httpx import AsyncClient, HTTPError
 from loguru import logger
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 from pydantic_settings import BaseSettings
 from yarl import URL
-
-
-class IPApiClientError(Exception):
-    """Custom exception for errors encountered when calling the IP-API service."""
-
-    pass
 
 
 class Iso639LanguageCode(str, Enum):
@@ -67,8 +62,6 @@ class Settings(BaseSettings):
 class IPApiResponse(BaseModel):
     """Schema for a single IP-API batch response entry."""
 
-    model_config = ConfigDict(validate_by_name=True, validate_by_alias=True)
-
     status: str | None = None
     message: str | None = None
     continent: str | None = None
@@ -95,14 +88,16 @@ class IPApiResponse(BaseModel):
     hosting: bool | None = None
     query: str | None = None
 
+    class Config:
+        """Controls the behavior of `IPApiResponse`."""
+
+        validate_assignment = True
+        populate_by_name = True
+        allow_population_by_field_name = True
+
 
 class IPApiClient:
-    """Aynchronous HTTP client for querying the IP-API batch endpoint.
-
-    Attributes:
-        client (AsyncClient): The underlying async HTTP client.
-        settings (Settings): A validated settings object containing configuration.
-    """
+    """Asynchronous HTTP client for querying the IP-API batch endpoint."""
 
     def __init__(self, settings: Settings) -> None:
         """Initialize the client with a settings object.
@@ -127,53 +122,71 @@ class IPApiClient:
         """Exit the asynchronous context manager, ensuring the client is closed."""
         await self.aclose()
 
-    async def fetch_batch_ip_data(self, ips: list[str]) -> list[IPApiResponse]:
-        """Perform a batch geolocation lookup asynchronously.
-
-        Args:
-            ips (list[str]): List of IP addresses to look up.
-
-        Returns:
-            list[IPApiResponse]: Parsed API responses.
-
-        Raises:
-            IPApiClientError: When the API call does not receive a response in the correct format.
-        """
-        if len(ips) > self.settings.max_batch_size:
-            logger.warning(
-                f"{len(ips)} IP addresses are listed, only querying for the first {self.settings.max_batch_size} "
-                "due to rate limits."
-            )
-            ips = ips[: self.settings.max_batch_size]
-
-        url = self.settings.get_ip_api_batch_json_url()
-
-        logger.debug(f"Sending batch IP request to {url} with {len(ips)} IPs.")
-        try:
-            response = await self.client.post(url, json=ips)
-            response.raise_for_status()
-            results = response.json()
-
-            if not isinstance(results, list):
-                logger.error("Unexpected response format from IP API.")
-                raise HTTPError("Expected a list of results from IP API.")
-
-            parsed_results = []
-            for item in results:
-                try:
-                    response = IPApiResponse.model_validate(item)
-                    parsed_results.append(response)
-                except ValidationError as e:
-                    logger.warning(f"Skipping invalid response item: {e}")
-
-            logger.info(f"Received {len(parsed_results)} valid responses from IP API.")
-            return parsed_results
-
-        except HTTPError as e:
-            logger.error("HTTP Exception for {e.request.url} - {e}")
-            raise IPApiClientError("IP API Client Exception") from e
-
     async def aclose(self) -> None:
         """Close the underlying HTTP client to release resources."""
         logger.debug("Closing HTTP client session.")
         await self.client.aclose()
+
+    async def fetch_single_batch(self, batch: list[str]) -> list[IPApiResponse]:
+        """Perform a single batch geolocation lookup.
+
+        Args:
+            batch (list[str]): Batch of IP addresses to look up.
+
+        Returns:
+            list[IPApiResponse]: Parsed API responses.
+        """
+        url = self.settings.get_ip_api_batch_json_url()
+        logger.debug(f"Sending batch IP request to {url} with {len(batch)} IPs.")
+
+        try:
+            response = await self.client.post(url, json=batch)
+            response.raise_for_status()
+            results = response.json()
+
+            if not isinstance(results, list):
+                err_msg = "Unexpected response format from IP API."
+                logger.error(err_msg)
+                raise HTTPError(err_msg)
+
+            parsed = []
+            for item in results:
+                try:
+                    parsed.append(IPApiResponse.model_validate(item))
+                except ValidationError as e:
+                    logger.warning(f"Skipping invalid response item {item}: {e}")
+            return parsed
+
+        except HTTPError as e:
+            logger.warning(f"HTTPError for {getattr(e.request, 'url', 'unknown')}: {e}")
+            return []
+
+    async def fetch_batch_ip_data(self, ips: list[str]) -> list[IPApiResponse]:
+        """Fetch geolocation data in concurrent batches in accordance with rate limits.
+
+        Args:
+            ips (list[str]): Collection of IP addresses.
+
+        Returns:
+            list[IPApiResponse]: Parsed API responses.
+        """
+        batches = [ips[i : i + self.settings.max_batch_size] for i in range(0, len(ips), self.settings.max_batch_size)]
+        logger.info(f"Processing {len(batches)} IP batches concurrently.")
+        batch_responses = await gather(*(self.fetch_single_batch(batch) for batch in batches))
+        flattened_batch_responses = [response for batch in batch_responses for response in batch]
+        logger.info(f"Fetched {len(flattened_batch_responses)} valid IP responses.")
+        return flattened_batch_responses
+
+    @classmethod
+    async def managed_fetch_batch_ip_data(cls, ips: list[str], settings: Settings) -> list["IPApiResponse"]:
+        """Fetch geolocation data for IP addresses encapsulating asynchronous context management.
+
+        Args:
+            ips (list[str]): A list of IP addresses to query.
+            settings (Settings): Configuration settings for the IP-API client.
+
+        Returns:
+            list[IPApiResponse]: List of parsed responses from the IP-API batch JSON post request.
+        """
+        async with IPApiClient(settings) as client:
+            return await client.fetch_batch_ip_data(ips)
