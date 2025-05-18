@@ -1,7 +1,7 @@
 # NetWatcher CLI
 
 [![PyPI version](https://badge.fury.io/py/netwatcher-cli.svg)](https://pypi.org/project/netwatcher-cli/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/pfischer1687/netwatcher-cli/blob/main/LICENSE)
 
 **NetWatcher CLI** monitors outbound network connections on your local machine and enriches them with IP geolocation and
 ownership data to help identify potentially suspicious processes.
@@ -15,7 +15,8 @@ ownership data to help identify potentially suspicious processes.
 │ 8.8.8.8 │ City, State Zip │ - ISP: Example ISP │ Suspicious   │ - Hosting provider      │ - Executable Path: …    │
 │         │ Country         │ - Org: Example Org │              │ - Proxy or VPN detected │ - Command Line: …       │
 │         │                 │ - AS: ASEXAMPLE    │              │ ...                     │ - Process Name: sus.exe │
-│         │                 │ - AS Name: EX      │              │                         │ - PID: 1234             |
+│         │                 │ - AS Name: EX      │              │                         │ - PID: 1234             │
+│         │                 │ ...                │              │                         │ ...                     │
 └─────────┴─────────────────┴────────────────────┴──────────────┴─────────────────────────┴─────────────────────────┘
 ...
 ```
@@ -24,7 +25,7 @@ ownership data to help identify potentially suspicious processes.
 
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Basic Usage](#usage)
 - [Development](#development)
 - [License](#license)
 
@@ -44,9 +45,23 @@ Install from [PyPI](https://pypi.org/project/netwatcher-cli):
 pip install netwatcher-cli
 ```
 
-## Usage
+## Basic Usage
 
-See the Typer-generated [docs](docs/cli.md) for the full CLI usage reference.
+```console
+$ nw scan [OPTIONS]
+```
+
+**Options**:
+
+- `-c, --country-code TEXT`: User&#x27;s ISO 3166-1 alpha-2 two-leter country code. [default: US]
+- `--html-dir PATH`: Optional directory location for which to write an HTML report.
+- `--lang TEXT`: Language code for the IP API response. [default: en]
+- `--log-dir PATH`: Optional directory location for which to write a log file.
+- `-v, --verbose`: Increase verbosity (-v, -vv, -vvv) [default: 1]
+- `--help`: Show this message and exit.
+
+See the [CLI docs](https://github.com/pfischer1687/netwatcher-cli/blob/main/docs/cli.md) for the full CLI usage
+reference.
 
 ## Development
 
@@ -82,15 +97,20 @@ uv pip install -r pyproject.toml --all-extras
 5. Run unit tests
 
 ```bash
-# -s allows print() output
-# -vvv increases verbosity
-uv run pytest -s -vvv
+uv run pytest [OPTIONS]
 ```
 
-6. Run pre-commit (requires **git-cliff**, see [Changelog Generation](#changelog-generation) for more)
+Some useful options:
+
+- `-s` – allows `print()` output
+- `-vvv` – increases verbosity
+
+See the [pytest docs](https://docs.pytest.org/en/stable/) for full usage and configuration details.
+
+6. Run pre-commit (requires **git-cliff**, see [Changelog Generation](#changelog-generation) for more) to run the
+   formatter/linter (Ruff), type checker (Pyright), doc generators (Typer/git-cliff), etc.
 
 ```bash
-# This runs formatters, linters, type checks (Pyright), secret scanners, and doc generators.
 uv run pre-commit run --all-files
 ```
 
@@ -107,4 +127,5 @@ cargo install git-cliff
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the
+[LICENSE](https://github.com/pfischer1687/netwatcher-cli/blob/main/LICENSE) file for more details.

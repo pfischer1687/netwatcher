@@ -5,7 +5,7 @@ NetWatcher CLI - Monitor outbound network connections.
 **Usage**:
 
 ```console
-$ netwatcher-cli [OPTIONS] COMMAND [ARGS]...
+$ nw [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -19,7 +19,7 @@ $ netwatcher-cli [OPTIONS] COMMAND [ARGS]...
 * `scan`: Scan IP addresses using IP-API with...
 * `version`: Print the installed version of the package.
 
-## `netwatcher-cli scan`
+## `nw scan`
 
 Scan IP addresses using IP-API with configurable logging and language support.
 
@@ -34,7 +34,7 @@ Args:
 **Usage**:
 
 ```console
-$ netwatcher-cli scan [OPTIONS]
+$ nw scan [OPTIONS]
 ```
 
 **Options**:
@@ -46,14 +46,14 @@ $ netwatcher-cli scan [OPTIONS]
 * `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 1]
 * `--help`: Show this message and exit.
 
-## `netwatcher-cli version`
+## `nw version`
 
 Print the installed version of the package.
 
 **Usage**:
 
 ```console
-$ netwatcher-cli version [OPTIONS]
+$ nw version [OPTIONS]
 ```
 
 **Options**:

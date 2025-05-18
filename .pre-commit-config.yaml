@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: generate-cli-docs
         name: Generate Typer CLI docs
-        entry: typer netwatcher_cli.main utils docs --name netwatcher-cli --output docs/cli.md --title "NetWatcher CLI"
+        entry: typer netwatcher_cli.main utils docs --name nw --output docs/cli.md --title "NetWatcher CLI"
         language: system
         pass_filenames: false
       - id: git-cliff
