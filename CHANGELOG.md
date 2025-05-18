@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### 🚀 Features
 
 - *(ip_api)* Batches IP address geolocation queries into asynchronous API requests according to rate limits.
+- *(proc)* Adds Process Info to UI table.
 
 ## [0.1.0] - 2025-05-16
 

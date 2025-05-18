@@ -1,11 +1,11 @@
-# NetWatcher
+# NetWatcher CLI
 
 NetWatcher CLI - Monitor outbound network connections.
 
 **Usage**:
 
 ```console
-$ netwatcher [OPTIONS] COMMAND [ARGS]...
+$ netwatcher-cli [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Options**:
@@ -19,21 +19,22 @@ $ netwatcher [OPTIONS] COMMAND [ARGS]...
 * `scan`: Scan IP addresses using IP-API with...
 * `version`: Print the installed version of the package.
 
-## `netwatcher scan`
+## `netwatcher-cli scan`
 
 Scan IP addresses using IP-API with configurable logging and language support.
 
 Args:
-    country_code (str): User&#x27;s ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
-    html_dir (Path | None): Optional directory location for which to write an HTML report. Defaults to `None`.
-    ip_api_lang (str): Language code for the IP API response. Defaults to `en`.
-    log_dir (Path | None): Optional directory location for which to write a log file. Defaults to `None`.
-    verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
+    country_code (str, optional): User&#x27;s ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
+    html_dir (Path | None, optional): Optional directory location for which to write an HTML report. Defaults to
+        `None`.
+    ip_api_lang (str, optional): Language code for the IP API response. Defaults to `en`.
+    log_dir (Path | None, optional): Optional directory location for which to write a log file. Defaults to `None`.
+    verbose (int, optional): Verbosity level (-v, -vv, -vvv). Defaults to 0.
 
 **Usage**:
 
 ```console
-$ netwatcher scan [OPTIONS]
+$ netwatcher-cli scan [OPTIONS]
 ```
 
 **Options**:
@@ -45,14 +46,14 @@ $ netwatcher scan [OPTIONS]
 * `-v, --verbose`: Increase verbosity (-v, -vv, -vvv)  [default: 1]
 * `--help`: Show this message and exit.
 
-## `netwatcher version`
+## `netwatcher-cli version`
 
 Print the installed version of the package.
 
 **Usage**:
 
 ```console
-$ netwatcher version [OPTIONS]
+$ netwatcher-cli version [OPTIONS]
 ```
 
 **Options**:
