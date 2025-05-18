@@ -34,7 +34,7 @@ ownership data to help identify potentially suspicious processes.
 - Retrieve process information associated with each connection.
 - Flag reasons to suspect possibly malicious activity.
 - Optionally generate threat assessment as HTML report.
-- Optionally output logs to disk.
+- Optionally output serialized logs to disk.
 
 ## Installation
 
