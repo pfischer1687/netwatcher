@@ -4,6 +4,7 @@ import pytest
 
 from netwatcher_cli.ip_api_client import IPApiResponse
 from netwatcher_cli.ip_threat_assessment import IPThreatAssessment
+from netwatcher_cli.rconn import RemoteConnection
 
 
 def get_mock_reasons() -> list[list[str]]:
@@ -27,7 +28,7 @@ def get_mock_reasons() -> list[list[str]]:
 
 
 @pytest.mark.usefixtures("mock_ip_api_responses")
-def test_get_reasons_returns_expected_threat_flags(mock_ip_api_responses: list[IPApiResponse]) -> None:
+def test_get_reasons(mock_ip_api_responses: list[IPApiResponse]) -> None:
     """Test that get_reasons returns correct threat indicators for different IP inputs.
 
     Args:
@@ -46,14 +47,19 @@ def test_get_reasons_returns_expected_threat_flags(mock_ip_api_responses: list[I
     assert threat_result == expected_threat
 
 
-@pytest.mark.usefixtures("mock_ip_api_responses")
-def test_from_batch_ip_data_returns_enriched_assessments(mock_ip_api_responses: list[IPApiResponse]) -> None:
+@pytest.mark.usefixtures("mock_remote_connection_map", "mock_ip_api_responses")
+def test_from_batch_ip_data(
+    mock_remote_connection_map: dict[str, RemoteConnection], mock_ip_api_responses: list[IPApiResponse]
+) -> None:
     """Test that from_batch_ip_data properly flags IPs and includes correct reasons.
 
     Args:
+        mock_remote_connection_map (dict[str, RemoteConnection]): Mock remote connection map.
         mock_ip_api_responses (list[IPApiResponse]): Mock IP API responses.
     """
-    assessments = IPThreatAssessment.from_batch_ip_data(mock_ip_api_responses, country_code="US")
+    assessments = IPThreatAssessment.from_batch_ip_data(
+        mock_remote_connection_map, mock_ip_api_responses, country_code="US"
+    )
     expected_reasons = get_mock_reasons()
 
     assert len(assessments) == 2

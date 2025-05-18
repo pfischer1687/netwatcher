@@ -9,12 +9,7 @@ from pydantic import BaseModel
 
 
 class Addr(NamedTuple):
-    """Represents a local or remote network address.
-
-    Attributes:
-        ip (str): IP address as a string.
-        port (int): Port number.
-    """
+    """Represents a local or remote network address."""
 
     ip: str
     port: int
@@ -126,16 +121,7 @@ class ProcessInfo(BaseModel):
 
 
 class RemoteConnection(BaseModel):
-    """Represents an established remote network connection.
-
-    Attributes:
-        local_ip (IPv4Address | IPv6Address): IP address on the local side.
-        local_port (int): Port on the local side.
-        remote_ip (IPv4Address | IPv6Address): IP address on the remote side.
-        remote_port (int): Port on the remote side.
-        status (str): Connection status (e.g., ESTABLISHED).
-        process_info (ProcessInfo | None): Metadata about the owning process. Defaults to `None`.
-    """
+    """Represents an established remote network connection."""
 
     local_ip: IPv4Address | IPv6Address
     local_port: int

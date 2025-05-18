@@ -1,8 +1,13 @@
 """Shared test fixtures for Netwatcher CLI unit tests."""
 
+from socket import AddressFamily, SocketKind
+from unittest.mock import MagicMock, patch
+
 import pytest
+from psutil import CONN_ESTABLISHED
 
 from netwatcher_cli.ip_api_client import IPApiResponse, Settings
+from netwatcher_cli.rconn import ProcessInfo, RemoteConnection
 
 
 @pytest.fixture
@@ -65,3 +70,38 @@ def mock_settings() -> Settings:
         Settings: A settings object configured for testing.
     """
     return Settings()
+
+
+@pytest.fixture
+def mock_connection() -> list[tuple]:
+    """Fixture that returns a mock `psutil` connection response for testing.
+
+    Returns:
+        list[tuple]: A mock connection matching the `psutil.net_connections` format (fd, family, type, laddr, raddr,
+            status, pid).
+    """
+    return [
+        (
+            42,
+            AddressFamily.AF_INET,
+            SocketKind.SOCK_STREAM,
+            MagicMock(ip="192.168.1.2", port=12345),
+            MagicMock(ip="93.184.216.34", port=80),
+            CONN_ESTABLISHED,
+            9999,
+        )
+    ]
+
+
+@pytest.fixture
+def mock_remote_connection_map(mock_connection: list[tuple]) -> dict[str, RemoteConnection]:
+    """Fixture that returns a map from mock IP addresses to mock `RemoteConnection`s.
+
+    Returns:
+        dict[str, RemoteConnection]: Map from mock IP addresses to mock `RemoteConnection`s.
+    """
+    with (
+        patch("netwatcher.rconn.net_connections", return_value=mock_connection),
+        patch.object(ProcessInfo, "from_pid", return_value=None),
+    ):
+        return RemoteConnection.get_remote_connection_map()

@@ -8,7 +8,7 @@ from typing import Self
 
 from httpx import AsyncClient, HTTPError
 from loguru import logger
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from pydantic_settings import BaseSettings
 from yarl import URL
 
@@ -37,7 +37,10 @@ class Settings(BaseSettings):
         html_dir (Path | None): Optional directory location for which to write an HTML report. Defaults to `None`.
         ip_api_batch_json_base_url (URL): Base URL for the batch JSON endpoint.
         ip_api_lang (Iso639LanguageCode): Language code for localizing response messages.
-        max_batch_size (int): Maximum number of queries in the IP-API batch endpoint before rate-limiting occurs.
+        max_batch_size (int): Maximum number of IP addresss in the query to the IP-API batch endpoint before
+            rate-limiting occurs.
+        max_queries (int): Maximum number of batched queries sent to the IP-API batch endpoint before rate-limiting
+            occurs (currently 15/minute).
         timeout (float): Timeout (in seconds) for the HTTP requests.
     """
 
@@ -47,6 +50,7 @@ class Settings(BaseSettings):
     ip_api_batch_json_base_url: URL = URL("http://ip-api.com/batch")
     ip_api_lang: Iso639LanguageCode = Iso639LanguageCode.EN
     max_batch_size: int = 100
+    max_queries: int = 15
     timeout: float = 5.0
 
     def get_ip_api_batch_json_url(self) -> str:
@@ -61,6 +65,8 @@ class Settings(BaseSettings):
 
 class IPApiResponse(BaseModel):
     """Schema for a single IP-API batch response entry."""
+
+    model_config = ConfigDict(populate_by_name=True, validate_assignment=True, validate_by_name=True)
 
     status: str | None = None
     message: str | None = None
@@ -87,13 +93,6 @@ class IPApiResponse(BaseModel):
     proxy: bool | None = None
     hosting: bool | None = None
     query: str | None = None
-
-    class Config:
-        """Controls the behavior of `IPApiResponse`."""
-
-        validate_assignment = True
-        populate_by_name = True
-        allow_population_by_field_name = True
 
 
 class IPApiClient:
@@ -171,6 +170,11 @@ class IPApiClient:
             list[IPApiResponse]: Parsed API responses.
         """
         batches = [ips[i : i + self.settings.max_batch_size] for i in range(0, len(ips), self.settings.max_batch_size)]
+        if len(batches) > 45:
+            logger.warning(
+                f"Only sending the first {self.settings.max_queries} batches of {self.settings.max_batch_size} IP "
+                f"addresses each out of {len(batches)} batches."
+            )
         logger.info(f"Processing {len(batches)} IP batches concurrently.")
         batch_responses = await gather(*(self.fetch_single_batch(batch) for batch in batches))
         flattened_batch_responses = [response for batch in batch_responses for response in batch]

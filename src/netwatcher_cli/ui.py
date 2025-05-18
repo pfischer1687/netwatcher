@@ -9,6 +9,7 @@ from rich.table import Table
 
 from .ip_api_client import IPApiResponse
 from .ip_threat_assessment import IPThreatAssessment
+from .rconn import ProcessInfo
 
 
 class IPTableRenderer:
@@ -55,7 +56,7 @@ class IPTableRenderer:
             ip_data (IPApiResponse): IP geolocation and ownership data.
 
         Returns:
-            str: Ownership summary with ISP, org, ASN, etc.
+            str: Ownership summary with ISP, org, ASN, and reverse DNS information.
         """
         ownership_parts = [
             ("ISP", ip_data.isp),
@@ -66,7 +67,31 @@ class IPTableRenderer:
         ]
         return "\n".join(f"- {label}: {value}" for label, value in ownership_parts if value)
 
-    def _build_table(self, assessments: list[IPThreatAssessment]) -> Table:
+    @staticmethod
+    def get_process_info(process_info: ProcessInfo | None = None) -> str:
+        """Format ownership and network identity fields.
+
+        Args:
+            process_info (ProcessInfo | None, optional): Information about a locally running process. Defaults to
+                `None`.
+
+        Returns:
+            str: Summary of process information.
+        """
+        if process_info is None:
+            return ""
+
+        process_info_parts = [
+            ("Executable Path", process_info.exe),
+            ("Command Line", " ".join(process_info.cmdline) if process_info.cmdline else None),
+            ("Process Name", process_info.name),
+            ("PID", process_info.pid),
+            ("Parent Name", process_info.parent_name),
+            ("Parent PID", process_info.parent_pid),
+        ]
+        return "\n".join(f"- {label}: {value}" for label, value in process_info_parts if value is not None)
+
+    def build_table(self, assessments: list[IPThreatAssessment]) -> Table:
         """Build a Rich table from a list of assessments.
 
         Args:
@@ -81,15 +106,17 @@ class IPTableRenderer:
         table.add_column("Ownership")
         table.add_column("Threat Level", style="bold")
         table.add_column("Assessment", style="red", overflow="fold")
+        table.add_column("Process Info", style="magenta", overflow="fold")
 
         for assessment in assessments:
-            ip = assessment.ip_data.query
+            ip = assessment.ip_data.query or ""
             geolocation = self.get_geolocation(assessment.ip_data)
             ownership = self.get_ownership(assessment.ip_data)
             threat_level = "[yellow]Suspicious" if assessment.is_suspicious else "[green]Clean"
-            reasons = "\n".join(f"- {r}" for r in assessment.reasons)
+            reasons = "\n".join(f"- {r}" for r in assessment.reasons) or ""
+            process_info = self.get_process_info(assessment.process_info)
 
-            table.add_row(ip, geolocation, ownership, threat_level, reasons)
+            table.add_row(ip, geolocation, ownership, threat_level, reasons, process_info)
 
         return table
 
@@ -102,7 +129,7 @@ class IPTableRenderer:
         if self.html_path:
             logger.info(f"Preparing to save HTML report to: {self.html_path}")
 
-        table = self._build_table(assessments)
+        table = self.build_table(assessments)
         self.console.print(table)
 
         if self.html_path:

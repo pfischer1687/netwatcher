@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+
+### 🚀 Features
+
+- *(ip_api)* Batches IP address geolocation queries into asynchronous API requests according to rate limits.
+
 ## [0.1.0] - 2025-05-16
 
 ### 🚀 Features
