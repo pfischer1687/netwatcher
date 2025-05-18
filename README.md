@@ -33,7 +33,8 @@ ownership data to help identify potentially suspicious processes.
 - View geolocation and BGP table details about remote internet connections.
 - Retrieve process information associated with each connection.
 - Flag reasons to suspect possibly malicious activity.
-- Output logs to file as well as generated HTML reports.
+- Optionally generate threat assessment as HTML report.
+- Optionally output logs to disk.
 
 ## Installation
 
