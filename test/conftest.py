@@ -101,7 +101,7 @@ def mock_remote_connection_map(mock_connection: list[tuple]) -> dict[str, Remote
         dict[str, RemoteConnection]: Map from mock IP addresses to mock `RemoteConnection`s.
     """
     with (
-        patch("netwatcher.rconn.net_connections", return_value=mock_connection),
+        patch("netwatcher_cli.rconn.net_connections", return_value=mock_connection),
         patch.object(ProcessInfo, "from_pid", return_value=None),
     ):
         return RemoteConnection.get_remote_connection_map()

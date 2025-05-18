@@ -46,10 +46,10 @@ dev-dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/pfischer1687/netwatcher/blob/main/docs/cli.md"
-Repository = "https://github.com/pfischer1687/netwatcher"
-Issues = "https://github.com/pfischer1687/netwatcher/issues"
-Changelog = "https://github.com/pfischer1687/netwatcher/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/pfischer1687/netwatcher-cli/blob/main/docs/cli.md"
+Repository = "https://github.com/pfischer1687/netwatcher-cli"
+Issues = "https://github.com/pfischer1687/netwatcher-cli/issues"
+Changelog = "https://github.com/pfischer1687/netwatcher-cli/blob/main/CHANGELOG.md"
 
 [project.scripts]
 nw = "netwatcher_cli.main:app"

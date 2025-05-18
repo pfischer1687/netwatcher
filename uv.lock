@@ -308,13 +308,8 @@ wheels = [
 ]
 
 [[package]]
-<<<<<<< HEAD
 name = "netwatcher-cli"
-version = "0.1.2"
-=======
-name = "netwatcher"
 version = "0.2.0"
->>>>>>> d13d2f1 (Ticks version.)
 source = { editable = "." }
 dependencies = [
     { name = "click" },
