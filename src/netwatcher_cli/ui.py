@@ -19,7 +19,8 @@ class IPTableRenderer:
         """Initialize the renderer.
 
         Args:
-            html_dir (Path | None): Optional directory location for which to write an HTML report. Defaults to `None`.
+            html_dir (Path | None, optional): Optional directory location for which to write an HTML report. Defaults to
+                `None`.
         """
         self.html_path: Path | None = None
 

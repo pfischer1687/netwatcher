@@ -69,8 +69,8 @@ def setup_logging(log_dir: Path | None = None, verbose: int = 1) -> None:
     with rotation and JSON serialization.
 
     Args:
-        log_dir (Path or None): Optional directory location for which to write a log file. Defaults to `None`.
-        verbose (int): Verbosity level (-v, -vv, -vvv). Defaults to 0.
+        log_dir (Path | None, optional): Optional directory location for which to write a log file. Defaults to `None`.
+        verbose (int, optional): Verbosity level (-v, -vv, -vvv). Defaults to 0.
     """
     logger.remove()
     level = Verbosity.from_count(verbose).value

@@ -51,7 +51,6 @@ class Sconn(NamedTuple):
         except Exception:
             return None
 
-        # PID will likely be present for an established remote connection
         if conn.pid is None:
             return None
 
@@ -79,8 +78,8 @@ class ProcessInfo(BaseModel):
         exe (str): Path to the executable.
         name (str): Name of the executable.
         pid (int): Process ID.
-        parent_name (Optional[str]): Name of the parent process.
-        parent_pid (Optional[int]): PID of the parent process.
+        parent_name (str | None, optional): Name of the parent process. Defaults to `None`.
+        parent_pid (int | None, optional): PID of the parent process. Defaults to `None`.
     """
 
     cmdline: list[str]

@@ -30,18 +30,20 @@ class Settings(BaseSettings):
     """Configuration settings for interacting with the IP-API batch endpoint.
 
     Attributes:
-        country_code (str): User's ISO 3166-1 alpha-2 two-leter country code.
-        fields (int | str): Fields to return in the response, defaults to bitmask for all including `status,message,
-            continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,offset,
-            currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query` (66846719).
-        html_dir (Path | None): Optional directory location for which to write an HTML report. Defaults to `None`.
-        ip_api_batch_json_base_url (URL): Base URL for the batch JSON endpoint.
-        ip_api_lang (Iso639LanguageCode): Language code for localizing response messages.
-        max_batch_size (int): Maximum number of IP addresss in the query to the IP-API batch endpoint before
-            rate-limiting occurs.
-        max_queries (int): Maximum number of batched queries sent to the IP-API batch endpoint before rate-limiting
-            occurs (currently 15/minute).
-        timeout (float): Timeout (in seconds) for the HTTP requests.
+        country_code (str, optional): User's ISO 3166-1 alpha-2 two-leter country code. Defaults to `US`.
+        fields (int | str, optional): Fields to return in the response. Defaults to bitmask for all including `status,
+            message,continent,continentCode,country,countryCode,region,regionName,city,district,zip,lat,lon,timezone,
+            offset,currency,isp,org,as,asname,reverse,mobile,proxy,hosting,query` (66846719).
+        html_dir (Path | None, optional): Optional directory location for which to write an HTML report. Defaults to
+            `None`.
+        ip_api_batch_json_base_url (URL, optional): Base URL for the batch JSON endpoint. Defaults to
+            `http://ip-api.com/batch`
+        ip_api_lang (Iso639LanguageCode, optional): Language code for localizing response messages. Defaults to `EN`.
+        max_batch_size (int, optional): Maximum number of IP addresss in the query to the IP-API batch endpoint before
+            rate-limiting occurs. Defaults to 100.
+        max_queries (int, optional): Maximum number of batched queries sent to the IP-API batch endpoint before
+            rate-limiting occurs. Defaults to 15 (per minute).
+        timeout (float, optional): Timeout (in seconds) for the HTTP requests. Defaults to 5.0
     """
 
     country_code: str = "US"
