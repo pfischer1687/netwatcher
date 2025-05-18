@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from netwatcher.ip_api_client import IPApiClient, IPApiResponse, Settings
+from netwatcher_cli.ip_api_client import IPApiClient, IPApiResponse, Settings
 
 
 @pytest.mark.asyncio

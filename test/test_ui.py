@@ -2,8 +2,8 @@
 
 import pytest
 
-from netwatcher.ip_api_client import IPApiResponse
-from netwatcher.ui import IPTableRenderer
+from netwatcher_cli.ip_api_client import IPApiResponse
+from netwatcher_cli.ui import IPTableRenderer
 
 
 @pytest.mark.usefixtures("mock_ip_api_responses")

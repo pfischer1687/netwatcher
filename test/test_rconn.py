@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import psutil
 
-from netwatcher.rconn import RemoteConnection, get_remote_connections
+from netwatcher_cli.rconn import RemoteConnection, get_remote_connections
 
 
 def get_mock_connection() -> list[tuple]:
@@ -29,10 +29,10 @@ def get_mock_connection() -> list[tuple]:
 
 
 def test_get_remote_connections_returns_valid_models() -> None:
-    """Tests that `netwatcher.rconn.get_remote_connections` returns a list of `RemoteConnection` instances."""
+    """Tests that `netwatcher_cli.rconn.get_remote_connections` returns a list of `RemoteConnection` instances."""
     mock_conn = get_mock_connection()
 
-    with patch("netwatcher.rconn.net_connections", return_value=mock_conn):
+    with patch("netwatcher_cli.rconn.net_connections", return_value=mock_conn):
         remote_conns = get_remote_connections()
 
     assert isinstance(remote_conns, list)

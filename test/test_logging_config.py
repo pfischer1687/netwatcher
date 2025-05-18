@@ -1,6 +1,6 @@
 """Unit tests for the custom logging configuration module."""
 
-from netwatcher.logging_config import Verbosity
+from netwatcher_cli.logging_config import Verbosity
 
 
 def test_verbosity_from_count() -> None:

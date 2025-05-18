@@ -2,7 +2,7 @@
 
 import pytest
 
-from netwatcher.ip_api_client import IPApiResponse, Settings
+from netwatcher_cli.ip_api_client import IPApiResponse, Settings
 
 
 @pytest.fixture

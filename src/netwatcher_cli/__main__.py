@@ -2,4 +2,4 @@
 
 from .main import app
 
-app(prog_name="netwatcher")
+app(prog_name="nw")

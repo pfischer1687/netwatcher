@@ -2,8 +2,8 @@
 
 import pytest
 
-from netwatcher.ip_api_client import IPApiResponse
-from netwatcher.ip_threat_assessment import IPThreatAssessment
+from netwatcher_cli.ip_api_client import IPApiResponse
+from netwatcher_cli.ip_threat_assessment import IPThreatAssessment
 
 
 def get_mock_reasons() -> list[list[str]]:
