@@ -4,7 +4,7 @@ from importlib.metadata import version as metadata_version
 
 import typer
 
-DISTRIBUTION_NAME = "netwatcher"
+DISTRIBUTION_NAME = "netwatcher-cli"
 
 app = typer.Typer()
 
