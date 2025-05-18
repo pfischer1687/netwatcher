@@ -4,7 +4,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/pfischer1687/netwatcher-cli/blob/main/LICENSE)
 
 **NetWatcher CLI** monitors outbound network connections on your local machine and enriches them with IP geolocation and
-ownership data to help identify potentially suspicious processes. See example terminal output below:
+ownership data to help identify potentially suspicious processes. See [example output](#example-output) below.
+
+### Features
+
+- Displays geolocation and BGP table details about remote internet connections.
+- Retrieves process information associated with each connection.
+- Flags reasons to suspect possibly malicious activity.
+- Optionally generates threat assessment as HTML report.
+- Optionally outputs serialized logs to disk.
+
+See the [CLI docs](https://github.com/pfischer1687/netwatcher-cli/blob/main/docs/cli.md) for the full CLI usage
+reference.
 
 ### Example Output
 
@@ -23,19 +34,10 @@ ownership data to help identify potentially suspicious processes. See example te
 
 ## Table of Contents
 
-- [Features](#features)
 - [Installation](#installation)
 - [Basic Usage](#usage)
 - [Development](#development)
 - [License](#license)
-
-## Features
-
-- View geolocation and BGP table details about remote internet connections.
-- Retrieve process information associated with each connection.
-- Flag reasons to suspect possibly malicious activity.
-- Optionally generate threat assessment as HTML report.
-- Optionally output serialized logs to disk.
 
 ## Installation
 
