@@ -69,5 +69,5 @@ def scan(
     ip_threat_assessments = IPThreatAssessment.from_batch_ip_data(
         remote_conn_map, batch_ip_data, country_code=settings.country_code
     )
-    renderer = IPTableRenderer(html_dir=settings.html_dir)
+    renderer = IPTableRenderer(html_dir=settings.html_dir, max_cmdline_display=settings.max_cmdline_display)
     renderer.render(ip_threat_assessments)

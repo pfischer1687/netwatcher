@@ -41,6 +41,8 @@ class Settings(BaseSettings):
         ip_api_lang (Iso639LanguageCode, optional): Language code for localizing response messages. Defaults to `EN`.
         max_batch_size (int, optional): Maximum number of IP addresss in the query to the IP-API batch endpoint before
             rate-limiting occurs. Defaults to 100.
+        max_cmdline_display (int, optional): Maximum number of command line arguments to display for the process in the
+            table. Defaults to 5.
         max_queries (int, optional): Maximum number of batched queries sent to the IP-API batch endpoint before
             rate-limiting occurs. Defaults to 15 (per minute).
         timeout (float, optional): Timeout (in seconds) for the HTTP requests. Defaults to 5.0
@@ -52,6 +54,7 @@ class Settings(BaseSettings):
     ip_api_batch_json_base_url: URL = URL("http://ip-api.com/batch")
     ip_api_lang: Iso639LanguageCode = Iso639LanguageCode.EN
     max_batch_size: int = 100
+    max_cmdline_display: int = 5
     max_queries: int = 15
     timeout: float = 5.0
 

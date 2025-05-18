@@ -63,5 +63,6 @@ def test_get_process_info(process_info: ProcessInfo | None, expected_pid_info: s
         process_info (ProcessInfo | None): Parameterized process information.
         expected_pid_info (str): Parameterized correctly formatted process information.
     """
-    pid_info = IPTableRenderer.get_process_info(process_info)
+    ip_table_renderer = IPTableRenderer()
+    pid_info = ip_table_renderer.get_process_info(process_info=process_info)
     assert pid_info == expected_pid_info

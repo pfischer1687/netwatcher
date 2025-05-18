@@ -15,14 +15,17 @@ from .rconn import ProcessInfo
 class IPTableRenderer:
     """Renderer for displaying IP threat assessments in a Rich-formatted terminal table."""
 
-    def __init__(self, html_dir: Path | None = None):
+    def __init__(self, html_dir: Path | None = None, max_cmdline_display: int = 5):
         """Initialize the renderer.
 
         Args:
             html_dir (Path | None, optional): Optional directory location for which to write an HTML report. Defaults to
                 `None`.
+            max_cmdline_display (int, optional): Number of command line arguments to display in the table for the
+                process.
         """
         self.html_path: Path | None = None
+        self.max_cmdline_display: int = 5
 
         if html_dir:
             html_dir.mkdir(parents=True, exist_ok=True)
@@ -68,8 +71,23 @@ class IPTableRenderer:
         ]
         return "\n".join(f"- {label}: {value}" for label, value in ownership_parts if value)
 
-    @staticmethod
-    def get_process_info(process_info: ProcessInfo | None = None) -> str:
+    def format_cmdline(self, args: list[str]) -> str:
+        """Truncates the command line arguments for the process.
+
+        Args:
+            args (list[str]): Commands line arguments for the process.
+
+        Returns:
+            str: Truncated command line arguments for the process.
+        """
+        if not args:
+            return ""
+
+        if len(args) > self.max_cmdline_display:
+            return " ".join(args[: self.max_cmdline_display]) + " …"
+        return " ".join(args)
+
+    def get_process_info(self, process_info: ProcessInfo | None = None) -> str:
         """Format ownership and network identity fields.
 
         Args:
@@ -82,9 +100,11 @@ class IPTableRenderer:
         if process_info is None:
             return ""
 
+        cmdline_str = self.format_cmdline(process_info.cmdline) if process_info.cmdline else None
+
         process_info_parts = [
             ("Executable Path", process_info.exe),
-            ("Command Line", " ".join(process_info.cmdline) if process_info.cmdline else None),
+            ("Command Line", cmdline_str),
             ("Process Name", process_info.name),
             ("PID", process_info.pid),
             ("Parent Name", process_info.parent_name),
