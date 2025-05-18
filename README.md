@@ -1,50 +1,60 @@
-# NetWatcher
+# NetWatcher CLI
 
-**NetWatcher** is a lightweight network connection monitoring tool written in Python. It helps you track active outbound
-connections on your system, monitor associated processes, and provides geolocation information for remote IP addresses.
+[![PyPI version](https://badge.fury.io/py/netwatcher-cli.svg)](https://pypi.org/project/netwatcher-cli/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-This tool is designed for:
+**NetWatcher CLI** monitors outbound network connections on your local machine and enriches them with IP geolocation and
+ownership data to identify potentially suspicious processes.
 
-- Developers monitoring network traffic.
-- Security-conscious users detecting unauthorized network connections.
-- Anyone interested in inspecting live network connections and associated processes.
+### Example Output
 
-## Features
-
-- Monitor active network connections.
-- View details about local and remote connections (IP address, port).
-- Retrieve process information associated with each connection (PID, process name).
-- Geolocation lookup for remote IP addresses.
-- Lightweight and fast CLI tool built with **Typer**.
-- Uses **uv**, the fast Python package and project manager, to manage dependencies and execution.
+```text
+┏━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ IP      ┃ Geolocation     ┃ Ownership          ┃ Threat Level ┃ Assessment              ┃ Process Info            ┃
+┡━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ 8.8.8.8 │ City, State Zip │ - ISP: Example ISP │ Suspicious   │ - Hosting provider      │ - Executable Path: …    │
+│         │ Country         │ - Org: Example Org │              │ - Proxy or VPN detected │ - Command Line: …       │
+│         │                 │ - AS: ASEXAMPLE    │              │ ...                     │ - Process Name: sus.exe │
+│         │                 │ - AS Name: EX      │              │                         │ - PID: 1234             |
+└─────────┴─────────────────┴────────────────────┴──────────────┴─────────────────────────┴─────────────────────────┘
+...
+```
 
 ## Table of Contents
 
+- [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-  - [CLI Usage](#cli-usage)
-- [Configuration](#configuration)
+- [Development](#development)
 - [License](#license)
+
+## Features
+
+- View geolocation and BGP table details about remote internet connections.
+- Retrieve process information associated with each connection.
+- Flag reasons to suspect possibly malicious activity.
+- Output logs to file as well as generated HTML reports.
 
 ## Installation
 
-### Install with `uv`
+Install from [PyPI](https://pypi.org/project/netwatcher-cli):
 
-1. **Install `uv`**:
+```bash
+pip install netwatcher-cli
+```
 
-   To manage dependencies and install **NetWatcher** efficiently, use **uv**. First, install `uv` if you haven't already
-   ([instructions](https://docs.astral.sh/uv/getting-started/installation/)).
+## Usage
 
-### From Source
+See the Typer-generated [docs](docs/cli.md) for the full CLI usage reference.
 
-1. Clone the repository:
+## Development
 
-   ```bash
-   git clone https://github.com/pfischer1687/netwatcher.git
-   cd netwatcher
-   ```
+1. Install `uv`:
 
-2. Install Python 3.13:
+   To manage dependencies and install **NetWatcher CLI** efficiently, use **uv**. You can install `uv`
+   ([here](https://docs.astral.sh/uv/getting-started/installation/)).
+
+2. Install Python >= 3.9:
 
 ```bash
 uv python install 3.13
@@ -68,37 +78,19 @@ source .venv/activate/bin
 uv pip install -r pyproject.toml --all-extras
 ```
 
-5. Run the script:
-
-```bash
-uv run nw scan
-```
-
-## Usage
-
-### CLI Usage
-
-The primary interface for NetWatcher is a command-line tool that can be executed with the following command:
-
-```bash
-uv run nw scan
-```
-
-This will scan active network connections and output the following information:
-
-- Local IP and Port: The local endpoint of the connection.
-- Remote IP and Port: The external endpoint the local process is connected to.
-- Process Name (PID): The name and PID of the process using the connection.
-- Geolocation Information: The city, region, and country of the remote IP.
-
-## For Developers
-
-### Running Tests
+5. Run unit tests
 
 ```bash
 # -s allows print() output
 # -vvv increases verbosity
 uv run pytest -s -vvv
+```
+
+6. Run pre-commit (requires **git-cliff**, see [Changelog Generation](#changelog-generation) for more)
+
+```bash
+# This runs formatters, linters, type checks (Pyright), secret scanners, and doc generators.
+uv run pre-commit run --all-files
 ```
 
 ### Changelog Generation
@@ -112,27 +104,6 @@ You can do this via cargo, the Rust package manager (which you can install
 cargo install git-cliff
 ```
 
-### Run All Pre-Commit Hooks
-
-```bash
-# This runs formatters, linters, type checks (Pyright), secret scanners, and doc generators.
-uv run pre-commit run --all-files
-```
-
-## Configuration
-
-By default, NetWatcher uses the `ipapi` service for IP geolocation lookups. If you need to change the geolocation
-service or provide your own API key, you can modify the `ip_lookup.py` file.
-
-### Configure a Custom Geolocation Service
-
-To use a different geolocation service, update the httpx API call in `ip_lookup.py` to integrate with your preferred
-provider. Ensure the response format remains consistent.
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-NetWatcher is a tool for monitoring active network connections with ease, using a simple and extensible design. Whether
-you're troubleshooting, securing your network, or just curious about what's happening on your machine, NetWatcher makes
-network monitoring simple and accessible.
