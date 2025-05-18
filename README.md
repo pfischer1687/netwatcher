@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 **NetWatcher CLI** monitors outbound network connections on your local machine and enriches them with IP geolocation and
-ownership data to identify potentially suspicious processes.
+ownership data to help identify potentially suspicious processes.
 
 ### Example Output
 
